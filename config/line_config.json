@@ -1,0 +1,37 @@
+{
+  "line_id": "LINE-A",
+  "demand_units_per_hour": 90,
+  "sim_dt_seconds": 10,
+  "fault_repair_steps": 60,
+  "maintenance_steps": 18,
+  "stations": [
+    {"id": "S1_PICK",    "name": "Pick and place",    "robots": 2, "nominal_cycle_s": 70,  "buffer_capacity": 20},
+    {"id": "S2_WELD",    "name": "Spot welding",      "robots": 3, "nominal_cycle_s": 110, "buffer_capacity": 15},
+    {"id": "S3_FASTEN",  "name": "Screw fastening",   "robots": 2, "nominal_cycle_s": 75,  "buffer_capacity": 15},
+    {"id": "S4_INSPECT", "name": "Vision inspection", "robots": 1, "nominal_cycle_s": 38,  "buffer_capacity": 25}
+  ],
+  "control": {
+    "kp": 0.5,
+    "ki": 0.05,
+    "integral_limit": 3.0,
+    "rate_tau_s": 300,
+    "ff_margin": 1.05,
+    "speed_min": 0.6,
+    "speed_max": 1.25,
+    "max_step": 0.08,
+    "fixed_speed": 1.0,
+    "blocked_threshold": 0.3,
+    "starved_threshold": 0.3,
+    "derate_risk": 0.5,
+    "derate_speed_cap": 0.85,
+    "derate_hysteresis": 0.1,
+    "maintenance_risk": 0.8,
+    "urgent_risk": 0.95
+  },
+  "safety": {
+    "max_joint_temp_c": 88,
+    "max_position_error_mm": 0.6,
+    "max_vibration_mm_s": 11,
+    "reset_temp_margin_c": 15
+  }
+}

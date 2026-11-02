@@ -1,0 +1,8 @@
+{
+  "source": "hand-tuned fallback (run `make train` to replace it with a Spark MLlib model)",
+  "features": ["joint_temp_c", "vibration_mm_s", "torque_nm", "position_error_mm", "speed_factor"],
+  "means": [55.0, 4.0, 52.0, 0.10, 1.0],
+  "stds": [15.0, 2.5, 12.0, 0.08, 0.15],
+  "coefficients": [0.6, 1.2, 0.3, 1.0, 0.2],
+  "intercept": -2.5
+}

@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "spark-robotic-assembly-control"
+version = "1.0.0"
+description = "Distributed control system for a robotic manufacturing assembly line using Apache Spark"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Piyush Kumar Burnwal" }]
+license = { text = "MIT" }
+dependencies = ["pyspark>=4.0,<4.1", "pandas>=2.2", "pyarrow>=15", "numpy>=1.26", "matplotlib>=3.8"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

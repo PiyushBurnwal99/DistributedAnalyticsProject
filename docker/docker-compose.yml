@@ -1,0 +1,57 @@
+# Standalone Spark cluster (1 master + 2 workers) plus the line simulator and the controller.
+#
+#   docker compose -f docker/docker-compose.yml up --build
+#
+# Spark master UI: http://localhost:8080   Driver UI (while running): http://localhost:4040
+# The project folder is mounted at /app on every container, which acts as the shared
+# file system for telemetry, commands, checkpoints and outputs.
+
+x-spark: &spark
+  build:
+    context: ..
+    dockerfile: docker/Dockerfile
+  image: rac-spark:4.0
+  user: root
+  volumes:
+    - ..:/app
+  environment:
+    - PYTHONPATH=/app/src
+
+services:
+  spark-master:
+    <<: *spark
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master --host spark-master
+    ports:
+      - "8080:8080"
+      - "7077:7077"
+
+  spark-worker-1:
+    <<: *spark
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077 --cores 2 --memory 2g
+    depends_on: [spark-master]
+
+  spark-worker-2:
+    <<: *spark
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077 --cores 2 --memory 2g
+    depends_on: [spark-master]
+
+  controller:
+    <<: *spark
+    command: >
+      bash -c "rm -rf /app/data/stream /app/data/output /app/data/checkpoints &&
+               mkdir -p /app/data/stream/telemetry &&
+               /opt/spark/bin/spark-submit --master spark://spark-master:7077
+               --conf spark.executor.memory=1g --conf spark.executor.cores=1
+               /app/scripts/spark_entry.py rac.spark_controller
+               --telemetry-dir /app/data/stream/telemetry --commands-dir /app/data/stream/commands
+               --output-dir /app/data/output --checkpoint-dir /app/data/checkpoints --timeout 600"
+    ports:
+      - "4040:4040"
+    depends_on: [spark-worker-1, spark-worker-2]
+
+  line:
+    <<: *spark
+    command: >
+      bash -c "sleep 45 && python3 -m rac.simulator online --steps 720 --real-interval 0.5
+               --telemetry-dir /app/data/stream/telemetry --commands-dir /app/data/stream/commands"
+    depends_on: [controller]
